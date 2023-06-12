@@ -1,3 +1,5 @@
+function generateRandomString() {}
+
 const express = require("express");
 const app = express();
 const PORT = 8080;
@@ -10,9 +12,13 @@ const urlDatabase = {
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const id = generateRandomString(); 
+  const longURL = req.body.longURL; 
+  urlDatabase[id] = longURL; 
+  console.log(urlDatabase); 
+  res.redirect(`/urls/${id}`); 
 });
+
 
 app.set("view engine", "ejs"); 
 
@@ -26,6 +32,12 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+
+app.get("/u/:id", (req, res) => {
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL];
+  res.redirect(longURL);
 });
 
 app.get("/urls", (req, res) => {
