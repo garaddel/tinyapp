@@ -14,22 +14,27 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.post("/urls", (req, res) => {
-  const id = generateRandomString(); 
-  const longURL = req.body.longURL; 
-  urlDatabase[id] = longURL; 
-  console.log(urlDatabase); 
-  res.redirect(`/urls/${id}`); 
+  const id = generateRandomString();
+  const longURL = req.body.longURL;
+  urlDatabase[id] = longURL;
+  console.log(urlDatabase);
+  res.redirect(`/urls/${id}`);
 });
 
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
   res.redirect('/urls');
-}); 
+});
 
 app.post("/login", (req, res) => {
-  const username = req.body.username; 
+  const username = req.body.username;
   res.cookie("username", username);
+  res.redirect("/urls");
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
   res.redirect("/urls");
 });
 
@@ -52,7 +57,7 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     urls: urlDatabase,
     username: req.cookies.username // Pass the username to the template
   };
@@ -60,12 +65,15 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies.username // Pass the username to the template
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { 
-    id: req.params.id, 
+  const templateVars = {
+    id: req.params.id,
     longURL: urlDatabase[req.params.id],
     username: req.cookies.username // Pass the username to the template
   };
